@@ -1,18 +1,23 @@
 #!/usr/bin/env node
 import { Command } from 'commander'; 
 
+import dotenv from 'dotenv';
+dotenv.config();
+
+import { intro, outro, log, select, text } from '@clack/prompts';
+import registerCreateCommand from './commands/create.js';
+
 const mb = new Command();
+const values = {}
 
 mb.name('mern-builder')
   .description('A CLI tool to scaffold a MERN stack application')
   .version('0.0.1-BETA');
 
-mb.command('create')
-  .description('Create a new MERN stack application')
-  .argument('<project-name>', 'Name of the new MERN stack application')
-  .action((projectName) => {
-    console.log(`Creating a new MERN stack application: ${projectName}`);
-    // Add logic to scaffold the MERN stack application here
-  });
 
-mb.parse(process.argv);
+const run = () => {
+  registerCreateCommand(mb);
+  mb.parse(process.argv);
+}
+
+run();
