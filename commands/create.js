@@ -1,16 +1,26 @@
-import { intro, log, outro, text } from "@clack/prompts";
+import { intro, log, outro, select, text } from "@clack/prompts";
 import fs from "fs-extra";
 import path from "path";
 import { execa } from 'execa';
 import ora from 'ora';
 import { setTimeout } from "timers/promises";
 import { fileURLToPath } from "url";
+import chalk from "chalk";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const templatesDir = path.join(__dirname, '../templates');
 
-console.log('Templates directory:', templatesDir);
+const typeScriptTemplates = {
+    'vanila': 'vanilla-ts',
+    'vue': 'vue-ts',
+    'react': 'react-ts',
+    'preact': 'preact-ts',
+    'lit': 'lit-ts',
+    'svelte': 'svelte-ts',
+    'solid': 'solid-ts',
+    'qwik': 'qwik-ts'
+}
 
 async function getAppName() {
     return await text({
@@ -22,7 +32,42 @@ async function getAppName() {
     });
 }
 
+function getTemplate(langaugeType, template) {
+    if (langaugeType === 'TypeScript') {
+        return typeScriptTemplates[template];
+    }
+    return template;
+}
+
 async function initializeViteClient(clientOriginalPath, CWD, clientPath) {
+    const languageType = [
+        { value: 'JavaScript', label: 'JavaScript' },
+        { value: 'TypeScript', label: 'TypeScript' }
+    ]
+
+    const templateTypes = [
+        { value: 'vanila', 'label': chalk.red('Vanilla') },
+        { value: 'vue', 'label': chalk.blue('Vue') },
+        { value: 'react', 'label': chalk.green('React') },
+        { value: 'preact', 'label': chalk.yellow('Preact') },
+        { value: 'lit', 'label': chalk.magenta('Lit') },
+        { value: 'svelte', 'label': chalk.cyan('Svelte') },
+        { value: 'solid', 'label': chalk.white('Solid') },
+        { value: 'qwik', 'label': chalk.bold('Qwik') }
+    ]
+
+    const languagePreference = await select({
+        message: 'Choose your preferred language:',
+        options: languageType,
+    });
+
+    const templatePreference = await select({
+        message: 'Choose your preferred template:',
+        options: templateTypes,
+    });
+
+    const template = getTemplate(languagePreference, templatePreference);
+
     const spinner = ora('Initializing Vite client...').start();
     spinner.color = 'cyan';
     await execa('npx', [
@@ -30,7 +75,7 @@ async function initializeViteClient(clientOriginalPath, CWD, clientPath) {
         clientOriginalPath,
         '--',
         '--template',
-        'react-ts',
+        template,
         ], {
         stdout: 'ignore',
         stderr: 'inherit',
