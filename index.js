@@ -1,11 +1,15 @@
 #!/usr/bin/env node
 import { Command } from 'commander'; 
+import fs from 'fs-extra';
+import path from "path";
 
 import dotenv from 'dotenv';
 dotenv.config();
 
 import { intro, outro, log, select, text } from '@clack/prompts';
 import registerCreateCommand from './commands/create.js';
+import { create } from 'domain';
+import registerPrismaCommand from './commands/prisma.js';
 
 const mb = new Command();
 const values = {}
@@ -15,9 +19,13 @@ mb.name('mern-builder')
   .version('0.0.1-BETA');
 
 
-const run = () => {
+const run = async () => {
+  const CWD = process.cwd();
+  const created = await fs.readJson(path.join(CWD, '.cli-state.json'))
+  const createIsRun = created.create;
   registerCreateCommand(mb);
+  registerPrismaCommand(mb, createIsRun);
   mb.parse(process.argv);
 }
 
-run();
+await run();

@@ -6,6 +6,7 @@ import ora from 'ora';
 import { setTimeout } from "timers/promises";
 import { fileURLToPath } from "url";
 import chalk from "chalk";
+import { saveCreate } from "../services/saveCreate.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -41,8 +42,8 @@ function getTemplate(langaugeType, template) {
 
 async function initializeViteClient(clientOriginalPath, CWD, clientPath) {
     const languageType = [
-        { value: 'JavaScript', label: 'JavaScript' },
-        { value: 'TypeScript', label: 'TypeScript' }
+        { value: 'JavaScript', label: chalk.green('JavaScript') },
+        { value: 'TypeScript', label: chalk.blue('TypeScript') }
     ]
 
     const templateTypes = [
@@ -96,7 +97,7 @@ async function initializeExpressServer(serverPath, CWD, appName) {
     
     const templateServer = path.join(templatesDir, '/server');
     const envTemplateFile = path.join(templatesDir, '/files/.envExample');
-
+    spinner.text = 'Creating server from template...';
     await fs.ensureDir(serverPath);
     await fs.copy(templateServer, path.join(serverPath));
     await execa('npm', ['init', '-y'], { cwd: serverPath, stdout: 'ignore', stderr: 'inherit' });
@@ -117,13 +118,14 @@ export default function registerCreateCommand(program) {
     const serverPath = path.join(CWD, (isDevelopment ? '/fake/server' : '/server'));
 
     program.command('create')
-    .description('Create a new MERN stack application')
+    .description('Create a new MERN stack application ' + chalk.red('<MUST BE RUN FIRST>'))
     .action(async () => {
         intro('Creating your MERN application...');
         const appName = await getAppName();
         const clientOriginalPath = (isDevelopment ? `/fake/${appName}` : appName)
         await initializeViteClient(clientOriginalPath, CWD, clientPath);
         await initializeExpressServer(serverPath, CWD, appName);
-        outro('Application created successfully!');
+        await saveCreate(CWD);
+        outro(chalk.green(`Successfully created MERN application: ${appName}`));
     });
 }    
