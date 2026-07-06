@@ -3,7 +3,7 @@ import fs from "fs-extra";
 
 export async function saveCreate(CWD){
   const isDevelopment = process.env.NODE_ENV === 'development';
-  const storagePath = path.join(CWD, '/.cli-state.json');
-  const storage = await fs.readJSON(storagePath);
-  await fs.writeJson(storagePath, { ...storage, create: true}, { spaces: 2 });
+  const statePath = path.join(CWD, (isDevelopment ? '/fake/.cli-state.json' : '/.cli-state.json'));
+  const storagePath = path.join(statePath);
+  await fs.outputFile(storagePath, JSON.stringify({ create: true }));
 }
