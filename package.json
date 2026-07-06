@@ -1,5 +1,5 @@
 {
-  "name": "mern-builder",
+  "name": "stack-builder",
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",
@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
-    "mern-builder": "./index.js"
+    "stack-builder": "./index.js"
   },
   "keywords": [],
   "author": "",

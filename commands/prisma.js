@@ -3,6 +3,7 @@ import chalk from "chalk";
 import { execa } from "execa";
 import ora from "ora";
 import path from "path";
+import fs from 'fs-extra';
 
 async function initializePrisma(serverPath) {
   const spinner = ora('Installing Prisma...').start();
@@ -34,11 +35,12 @@ export default function registerPrismaCommand(program, createdIsRun) {
         await initializePrisma(serverPath);
         process.exit(0)
       }
-      const {uri} = program.opts();
+      const {uri} = options;
       if (uri) {
         const envFilePath = path.join(serverPath, '.env');
         const envContent = `DATABASE_URL="${uri}"\n`;
-        await fs.writeFile(envFilePath, envContent);
+        const currentEnvContent = await fs.readFile(envFilePath);
+        await fs.writeFile(envFilePath, { ...currentEnvContent, ...envContent });
         log.message(chalk.greenBright(`Database connection URI has been set in ${envFilePath}`));
       }
     })
