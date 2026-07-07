@@ -1,6 +1,6 @@
 {
   "name": "stack-builder",
-  "version": "1.0.0",
+  "version": "1.0.0-beta",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -10,7 +10,7 @@
     "stack-builder": "./index.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "war.per",
   "license": "ISC",
   "description": "",
   "dependencies": {

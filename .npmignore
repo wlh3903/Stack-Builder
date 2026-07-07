@@ -4,3 +4,4 @@ package-lock.json
 fake/
 *.tgz
 package
+README.md
